@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import classnames from "classnames";
 import debounce from "lodash/debounce";
 import getOr from "lodash/fp/getOr";
@@ -12,94 +12,85 @@ import {
 } from "./default-renderers";
 import { TableProps } from "./types";
 
-export default class Table extends React.Component<TableProps> {
-  tableRef: React.RefObject<HTMLTableElement>;
+const Table = ({
+  className,
+  columns = [],
+  data = [],
+  fixedColumnCount = 0,
+  fixedHeader,
+  renderTd = defaultRenderTd,
+  renderTh = defaultRenderTh,
+  renderTr = defaultRenderTr,
+  metadata,
+  theme = "default"
+}: TableProps) => {
+  const tableRef = useRef();
+  const debouncedStackFixedColumns = useRef<() => void>(() => {});
+  const innerMetadata = suffixMetadata(metadata);
 
-  debouncedStackFixedColumns: () => void;
-
-  constructor(props: TableProps) {
-    super(props);
-    this.tableRef = React.createRef();
-    this.debouncedStackFixedColumns = debounce(this.stackFixedColumns, 200);
-  }
-
-  componentDidMount = () => {
-    window.addEventListener("resize", this.debouncedStackFixedColumns);
-    this.stackFixedColumns();
-  };
-
-  componentDidUpdate = () => this.debouncedStackFixedColumns();
-
-  componentWillUnmount = () => {
-    window.removeEventListener("resize", this.debouncedStackFixedColumns);
-  };
-
-  stackFixedColumns = () => {
-    const { fixedColumnCount } = this.props;
-    const tableElement = this.tableRef.current;
+  const stackFixedColumns = () => {
+    const tableElement = tableRef.current;
     if (!fixedColumnCount || tableElement == null) return;
     stackColumnsToTheLeft(tableElement, fixedColumnCount);
   };
 
-  render() {
-    const {
-      className,
-      columns = [],
-      data = [],
-      fixedColumnCount = 0,
-      fixedHeader,
-      renderTd = defaultRenderTd,
-      renderTh = defaultRenderTh,
-      renderTr = defaultRenderTr,
-      metadata,
-      theme = "default"
-    } = this.props;
+  useEffect(() => {
+    debouncedStackFixedColumns.current = debounce(stackFixedColumns, 200);
+    window.addEventListener("resize", debouncedStackFixedColumns.current);
+    stackFixedColumns();
 
-    const innerMetadata = suffixMetadata(metadata);
+    return () => {
+      window.removeEventListener("resize", debouncedStackFixedColumns.current);
+    };
+    /* eslint-disable-next-line */
+  }, []);
 
-    return (
-      <table
-        className={classnames(
-          className,
-          fixedHeader ? styles.fixedHeader : null,
-          styles.table,
-          styles[`fixedColumnCount${fixedColumnCount}`],
-          theme ? styles[`${theme}Theme`] : styles.defaultTheme
-        )}
-        ref={this.tableRef}
-        {...parseMetadata(metadata)}
-      >
-        <thead {...parseMetadata(innerMetadata("head"))}>
-          <tr {...parseMetadata(innerMetadata("headRow"))}>
-            {columns
-              .map((column) => ({ renderTh, ...column }))
+  debouncedStackFixedColumns.current();
+
+  return (
+    <table
+      className={classnames(
+        className,
+        fixedHeader ? styles.fixedHeader : null,
+        styles.table,
+        styles[`fixedColumnCount${fixedColumnCount}`],
+        theme ? styles[`${theme}Theme`] : styles.defaultTheme
+      )}
+      ref={tableRef}
+      {...parseMetadata(metadata)}
+    >
+      <thead {...parseMetadata(innerMetadata("head"))}>
+        <tr {...parseMetadata(innerMetadata("headRow"))}>
+          {columns
+            .map((column) => ({ renderTh, ...column }))
+            .map((column, columnIndex) =>
+              column.renderTh({ column, columnIndex, metadata })
+            )}
+        </tr>
+      </thead>
+      <tbody {...parseMetadata(innerMetadata("body"))}>
+        {data.map((dataRow, rowIndex) =>
+          renderTr({
+            children: columns
+              .map((column) => ({ renderTd, ...column }))
               .map((column, columnIndex) =>
-                column.renderTh({ column, columnIndex, metadata })
-              )}
-          </tr>
-        </thead>
-        <tbody {...parseMetadata(innerMetadata("body"))}>
-          {data.map((dataRow, rowIndex) =>
-            renderTr({
-              children: columns
-                .map((column) => ({ renderTd, ...column }))
-                .map((column, columnIndex) =>
-                  column.renderTd({
-                    column,
-                    columnIndex,
-                    content: getOr(undefined, column.key || "", dataRow),
-                    dataRow,
-                    rowIndex,
-                    metadata
-                  })
-                ),
-              dataRow,
-              rowIndex,
-              metadata
-            })
-          )}
-        </tbody>
-      </table>
-    );
-  }
-}
+                column.renderTd({
+                  column,
+                  columnIndex,
+                  content: getOr(undefined, column.key || "", dataRow),
+                  dataRow,
+                  rowIndex,
+                  metadata
+                })
+              ),
+            dataRow,
+            rowIndex,
+            metadata
+          })
+        )}
+      </tbody>
+    </table>
+  );
+};
+
+export default Table;
