@@ -3,7 +3,8 @@ import { PropsWithMetadata } from "@highlight-ui/utils-commons";
 
 export type TableHeadCellProps = PropsWithMetadata<{
   column: TableColumnDefinition;
-  columnIndex: number;
+  idx: number;
+  reorder: (item: DraggedItem, newIndex: number) => void;
 }>;
 
 export type TableCellProps<TDataRow = any> = PropsWithMetadata<{
@@ -37,6 +38,11 @@ export type TableColumnDefinition<TDataRow = any> = {
   label?: string;
   renderTh?: TableHeadCellRenderer;
   renderTd?: TableCellRenderer<TDataRow>;
+};
+
+export type DraggedItem = {
+  id: TableColumnDefinition["key"];
+  idx: number;
 };
 
 export type TableProps<TDataRow = any> = PropsWithMetadata<{
@@ -76,4 +82,6 @@ export type TableProps<TDataRow = any> = PropsWithMetadata<{
    * Can be used to specify the theme. it is a `defaultTheme` by default.
    */
   theme?: "light" | "default";
+
+  setColumnsOrder: (newOrder: TableColumnDefinition[]) => void;
 }>;

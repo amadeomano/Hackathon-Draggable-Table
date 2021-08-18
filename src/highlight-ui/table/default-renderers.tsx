@@ -1,17 +1,48 @@
-import React from "react";
+import React, { useRef } from "react";
 import mapValues from "lodash/fp/mapValues";
 import { parseMetadata } from "@highlight-ui/utils-commons";
+import { useDrop, useDrag } from "react-dnd";
 import {
+  DraggedItem,
   TableCellRenderer,
   TableHeadCellRenderer,
   TableRowRenderer
 } from "./types";
 
 export const renderTh: TableHeadCellRenderer = (props) => {
-  const { column, metadata } = props;
+  /* eslint-disable-next-line */
+  const ref = useRef();
+  const { column, idx, metadata, reorder } = props;
+
+  /* eslint-disable-next-line */
+  const [, drop] = useDrop({
+    accept: "column",
+    drop: (item: DraggedItem) => {
+      reorder(item, idx);
+    }
+  });
+
+  /* eslint-disable-next-line */
+  const [{ isDragging }, drag, preview] = useDrag({
+    type: "column",
+    item: () => {
+      return {
+        id: column.key,
+        idx
+      } as DraggedItem;
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging()
+    })
+  });
+
+  drag(drop(ref));
+
   return (
     <th
+      ref={ref}
       key={column.key}
+      draggable="true"
       {...parseMetadata(mapValues((x) => `${x}-headCell`, metadata))}
     >
       {column.label}

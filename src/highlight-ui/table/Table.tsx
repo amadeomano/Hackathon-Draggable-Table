@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import classnames from "classnames";
 import debounce from "lodash/debounce";
 import getOr from "lodash/fp/getOr";
@@ -10,7 +10,7 @@ import {
   renderTh as defaultRenderTh,
   renderTr as defaultRenderTr
 } from "./default-renderers";
-import { TableProps } from "./types";
+import { DraggedItem, TableProps } from "./types";
 
 const Table = ({
   className,
@@ -22,7 +22,8 @@ const Table = ({
   renderTh = defaultRenderTh,
   renderTr = defaultRenderTr,
   metadata,
-  theme = "default"
+  theme = "default",
+  setColumnsOrder
 }: TableProps) => {
   const tableRef = useRef();
   const debouncedStackFixedColumns = useRef<() => void>(() => {});
@@ -45,6 +46,20 @@ const Table = ({
     /* eslint-disable-next-line */
   }, []);
 
+  const reorder = useCallback(
+    (item: DraggedItem, newIndex: number) => {
+      const newOrder = [...columns];
+      const { idx: currentIndex } = item;
+
+      const [removedColumn] = newOrder.splice(currentIndex, 1);
+
+      newOrder.splice(newIndex, 0, removedColumn);
+
+      setColumnsOrder(newOrder);
+    },
+    [columns, setColumnsOrder]
+  );
+
   debouncedStackFixedColumns.current();
 
   return (
@@ -63,8 +78,8 @@ const Table = ({
         <tr {...parseMetadata(innerMetadata("headRow"))}>
           {columns
             .map((column) => ({ renderTh, ...column }))
-            .map((column, columnIndex) =>
-              column.renderTh({ column, columnIndex, metadata })
+            .map((column, idx) =>
+              column.renderTh({ column, idx, metadata, reorder })
             )}
         </tr>
       </thead>
