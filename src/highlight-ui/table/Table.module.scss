@@ -1,0 +1,172 @@
+@import '~@highlight-ui/theme/variables';
+@import '~@highlight-ui/theme/mixins/make-disabled';
+
+$maximum-fixed-columns: 5;
+
+$border-color: $border-color-base;
+$font-size: 14px;
+$line-height: 24px;
+
+$row-default-background: $white;
+$row-hover-darkening: 2.5%;
+$row-selected-darkening: 7.5%;
+$row-highlight-colors: (
+  'warning': $ui-warning-lightest,
+);
+
+@mixin row-style($backgroundColor) {
+  background-color: $backgroundColor;
+
+  &:hover {
+    background-color: darken($backgroundColor, $row-hover-darkening);
+  }
+
+  &:global(.selected) {
+    background-color: darken($backgroundColor, $row-selected-darkening);
+
+    &:hover {
+      background-color: darken(
+        $backgroundColor,
+        $row-hover-darkening + $row-selected-darkening
+      );
+    }
+  }
+}
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  max-width: 100%;
+  text-align: left;
+
+  tbody tr {
+    @include row-style($white);
+
+    @each $name, $color in $row-highlight-colors {
+      &:global(.#{$name}) {
+        @include row-style($color);
+      }
+    }
+  }
+
+  td,
+  th {
+    background-clip: padding-box;
+    background-color: inherit;
+    line-height: $line-height;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $spacer-4;
+  }
+
+  th {
+    border-top: $border-width-base $border-style-base $border-color;
+    padding: $spacer-3 $spacer-4;
+
+    &:global(.sortable) {
+      cursor: pointer;
+
+      &:hover {
+        background-color: #d3dfe7;
+      }
+    }
+
+    &:global(.sorted-ascending),
+    &:global(.sorted-descending) {
+      background-color: #d3dfe7;
+
+      &::after {
+        color: $primary-brand-accent;
+        font-family: 'Font Awesome 5 Pro';
+        font-size: 10px;
+        margin-left: 8px;
+      }
+    }
+
+    &:global(.sorted-ascending)::after {
+      content: '\f357';
+    }
+
+    &:global(.sorted-descending)::after {
+      content: '\f354';
+    }
+  }
+
+  @for $i from 1 through $maximum-fixed-columns {
+    &.fixedColumnCount#{$i} {
+      th:nth-child(-n + #{$i}) {
+        left: 0;
+        position: sticky;
+        z-index: 2;
+      }
+
+      td:nth-child(-n + #{$i}) {
+        left: 0;
+        position: sticky;
+      }
+
+      tr > :nth-child(#{$i}) {
+        border-right: 1px solid $border-color;
+      }
+    }
+  }
+}
+
+.fixedHeader thead th {
+  position: sticky;
+  top: 0;
+}
+
+.defaultTheme {
+  thead tr {
+    background-color: $cool-gray-lighter;
+  }
+
+  td,
+  th {
+    border-bottom: 1px solid $border-color;
+    font-size: $font-size;
+  }
+}
+
+.lightTheme {
+  thead {
+    tr {
+      background-color: $white;
+    }
+
+    th {
+      border: 0;
+      color: $neutral-gray;
+      font-family: $font-family-base;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      line-height: $font-size-md;
+      padding: $spacer-5;
+
+      &:first-child {
+        padding-left: $spacer-10;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      @include row-style($white);
+
+      td {
+        border: 0;
+        color: $text-color-primary;
+        font-size: $font-size-base;
+        line-height: $line-height-base;
+        padding: $spacer-5;
+
+        &:first-child {
+          padding-left: $spacer-10;
+        }
+      }
+    }
+  }
+}
