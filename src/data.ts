@@ -1,4 +1,5 @@
-export const columns = [
+import { TableColumnDefinition } from "./highlight-ui/table/types";
+export const columns: TableColumnDefinition[] = [
   {
     key: "firstName",
     label: "First Name"
