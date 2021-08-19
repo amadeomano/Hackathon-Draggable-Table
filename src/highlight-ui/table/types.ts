@@ -45,6 +45,7 @@ export type TableColumnDefinition<TDataRow = any> = {
 export type DraggedItem = {
   id: TableColumnDefinition["key"];
   idx: number;
+  label: string;
 };
 
 export type TableProps<TDataRow = any> = PropsWithMetadata<{
