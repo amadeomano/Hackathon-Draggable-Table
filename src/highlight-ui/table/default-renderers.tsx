@@ -1,15 +1,15 @@
-import React, { useRef } from "react";
+import React, { useRef, FC } from "react";
 import mapValues from "lodash/fp/mapValues";
 import { parseMetadata } from "@highlight-ui/utils-commons";
 import { useDrop, useDrag } from "react-dnd";
 import {
   DraggedItem,
   TableCellRenderer,
-  TableHeadCellRenderer,
-  TableRowRenderer
+  TableRowRenderer,
+  TableHeadCellProps
 } from "./types";
 
-export const renderTh: TableHeadCellRenderer = (props) => {
+export const Th: FC<TableHeadCellProps> = (props) => {
   /* eslint-disable-next-line */
   const ref = useRef();
   const { column, idx, metadata, reorder } = props;
@@ -30,10 +30,7 @@ export const renderTh: TableHeadCellRenderer = (props) => {
         id: column.key,
         idx
       } as DraggedItem;
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    })
+    }
   });
 
   drag(drop(ref));
@@ -42,7 +39,6 @@ export const renderTh: TableHeadCellRenderer = (props) => {
     <th
       ref={ref}
       key={column.key}
-      draggable="true"
       {...parseMetadata(mapValues((x) => `${x}-headCell`, metadata))}
     >
       {column.label}

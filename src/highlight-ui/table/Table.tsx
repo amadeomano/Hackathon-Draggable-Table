@@ -7,7 +7,7 @@ import styles from "./Table.module.scss";
 import stackColumnsToTheLeft from "./dom-helpers";
 import {
   renderTd as defaultRenderTd,
-  renderTh as defaultRenderTh,
+  Th as DefaultTh,
   renderTr as defaultRenderTr
 } from "./default-renderers";
 import { DraggedItem, TableProps } from "./types";
@@ -19,7 +19,7 @@ const Table = ({
   fixedColumnCount = 0,
   fixedHeader,
   renderTd = defaultRenderTd,
-  renderTh = defaultRenderTh,
+  Th = DefaultTh,
   renderTr = defaultRenderTr,
   metadata,
   theme = "default",
@@ -76,11 +76,9 @@ const Table = ({
     >
       <thead {...parseMetadata(innerMetadata("head"))}>
         <tr {...parseMetadata(innerMetadata("headRow"))}>
-          {columns
-            .map((column) => ({ renderTh, ...column }))
-            .map((column, idx) =>
-              column.renderTh({ column, idx, metadata, reorder })
-            )}
+          {columns.map((column, idx) => (
+            <Th key={column.key} {...{ column, idx, metadata, reorder }} />
+          ))}
         </tr>
       </thead>
       <tbody {...parseMetadata(innerMetadata("body"))}>

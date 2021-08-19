@@ -73,7 +73,7 @@ export type TableProps<TDataRow = any> = PropsWithMetadata<{
   /**
    * Can be used to provide a custom render function for all the header cells in the table
    */
-  renderTh?: TableHeadCellRenderer;
+  Th?: TableHeadCellRenderer;
   /**
    * Can be used to provide a custom render function for all the rows in the table
    */
