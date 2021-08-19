@@ -5,6 +5,7 @@ export type TableHeadCellProps = PropsWithMetadata<{
   column: TableColumnDefinition;
   idx: number;
   reorder: (item: DraggedItem, newIndex: number) => void;
+  onDragStatusChange: (index?: number) => void;
 }>;
 
 export type TableCellProps<TDataRow = any> = PropsWithMetadata<{
@@ -13,6 +14,7 @@ export type TableCellProps<TDataRow = any> = PropsWithMetadata<{
   content: any;
   dataRow: TDataRow;
   rowIndex: number;
+  isDragged?: boolean;
 }>;
 
 export type TableRowProps<TDataRow = any> = PropsWithMetadata<{

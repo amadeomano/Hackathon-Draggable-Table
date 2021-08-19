@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
 import classnames from "classnames";
 import debounce from "lodash/debounce";
 import getOr from "lodash/fp/getOr";
@@ -28,6 +28,7 @@ const Table = ({
   const tableRef = useRef();
   const debouncedStackFixedColumns = useRef<() => void>(() => {});
   const innerMetadata = suffixMetadata(metadata);
+  const [dragIndex, setDragIndex] = useState(null);
 
   const stackFixedColumns = () => {
     const tableElement = tableRef.current;
@@ -77,7 +78,11 @@ const Table = ({
       <thead {...parseMetadata(innerMetadata("head"))}>
         <tr {...parseMetadata(innerMetadata("headRow"))}>
           {columns.map((column, idx) => (
-            <Th key={column.key} {...{ column, idx, metadata, reorder }} />
+            <Th
+              key={column.key}
+              {...{ column, idx, metadata, reorder }}
+              onDragStatusChange={setDragIndex}
+            />
           ))}
         </tr>
       </thead>
@@ -93,7 +98,8 @@ const Table = ({
                   content: getOr(undefined, column.key || "", dataRow),
                   dataRow,
                   rowIndex,
-                  metadata
+                  metadata,
+                  isDragged: dragIndex === columnIndex
                 })
               ),
             dataRow,
