@@ -22,7 +22,7 @@ const DropLine = () => {
       style={{
         position: "absolute",
         width: 2,
-        left,
+        transform: `translate(${left}px, 0)`,
         top: 40,
         bottom: 0,
         backgroundColor: "#0db5df",
