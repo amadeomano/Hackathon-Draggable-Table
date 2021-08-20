@@ -11,7 +11,7 @@ const Preview = () => {
     })
   );
 
-  return isDragging ? (
+  return (
     <div
       className="preview"
       style={{
@@ -20,9 +20,23 @@ const Preview = () => {
         }px)`
       }}
     >
-      {item.label}
+      <div
+        className="title"
+        style={{
+          transform: `translate(0, ${isDragging ? 0 : 30}px)`,
+          opacity: isDragging ? 1 : 0
+        }}
+      >
+        {item?.label}
+      </div>
+      <div
+        className="shadow"
+        style={{
+          opacity: isDragging ? 1 : 0
+        }}
+      />
     </div>
-  ) : null;
+  );
 };
 
 export default Preview;
