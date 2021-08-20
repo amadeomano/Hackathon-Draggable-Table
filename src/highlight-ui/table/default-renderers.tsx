@@ -16,14 +16,6 @@ export const Th: FC<TableHeadCellProps> = (props) => {
   const { column, idx, metadata, reorder, onDragStatusChange } = props;
 
   /* eslint-disable-next-line */
-  const [, drop] = useDrop({
-    accept: "column",
-    drop: (item: DraggedItem) => {
-      reorder(item, idx);
-    }
-  });
-
-  /* eslint-disable-next-line */
   const [{ isDragging }, drag, preview] = useDrag({
     type: "column",
     item: {
@@ -37,7 +29,6 @@ export const Th: FC<TableHeadCellProps> = (props) => {
   });
 
   drag(ref);
-  drop(ref);
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true });

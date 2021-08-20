@@ -3,6 +3,8 @@ import classnames from "classnames";
 import debounce from "lodash/debounce";
 import getOr from "lodash/fp/getOr";
 import { parseMetadata, suffixMetadata } from "@highlight-ui/utils-commons";
+import { useDrop } from "react-dnd";
+import { useAreas } from "./hooks";
 import styles from "./Table.module.scss";
 import stackColumnsToTheLeft from "./dom-helpers";
 import {
@@ -60,6 +62,23 @@ const Table = ({
     },
     [columns, setColumnsOrder]
   );
+
+  const areas = useAreas();
+
+  /* eslint-disable-next-line */
+  const [, drop] = useDrop({
+    accept: "column",
+    drop: (item: DraggedItem, monitor) => {
+      const dropCoords = monitor.getClientOffset();
+      const targetIndex = areas.reduce(
+        (acc, curr, idx) =>
+          dropCoords?.x >= curr.start && dropCoords?.x < curr.end ? idx : acc,
+        item.idx
+      );
+      reorder(item, targetIndex);
+    }
+  });
+  drop(tableRef);
 
   debouncedStackFixedColumns.current();
 
