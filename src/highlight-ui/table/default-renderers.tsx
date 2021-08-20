@@ -16,11 +16,14 @@ export const Th: FC<TableHeadCellProps> = (props) => {
   const { column, idx, metadata, reorder, onDragStatusChange } = props;
 
   /* eslint-disable-next-line */
-  const [, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: "column",
     drop: (item: DraggedItem) => {
       reorder(item, idx);
-    }
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver()
+    })
   });
 
   /* eslint-disable-next-line */
@@ -36,7 +39,8 @@ export const Th: FC<TableHeadCellProps> = (props) => {
     })
   });
 
-  drag(drop(ref));
+  drag(ref);
+  drop(ref);
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true });
@@ -65,7 +69,9 @@ export const renderTd: TableCellRenderer = (props) => {
   return (
     <td
       key={column.key}
-      style={{ opacity: isDragged ? 0.2 : 1 }}
+      style={{
+        opacity: isDragged ? 0.2 : 1
+      }}
       {...parseMetadata(mapValues((x) => `${x}-cell`, metadata))}
     >
       {content}

@@ -5,12 +5,12 @@ const Preview = () => {
   const { isDragging, item, currentOffset, initialOffset } = useDragLayer(
     (monitor) => ({
       item: monitor.getItem(),
-      itemType: monitor.getItemType(),
       initialOffset: monitor.getInitialSourceClientOffset(),
       currentOffset: monitor.getSourceClientOffset(),
       isDragging: monitor.isDragging()
     })
   );
+
   return isDragging ? (
     <div
       className="preview"
