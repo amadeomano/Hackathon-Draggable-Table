@@ -1,4 +1,5 @@
 import { useDragLayer } from "react-dnd";
+import { useAreas } from "./hooks";
 
 const DropLine = () => {
   const { isDragging, currentOffset } = useDragLayer((monitor) => ({
@@ -6,9 +7,7 @@ const DropLine = () => {
     currentOffset: monitor.getClientOffset()
   }));
 
-  const areas = [...document.querySelectorAll("table th")]
-    .map((n) => n.getBoundingClientRect())
-    .map(({ x, width }) => ({ start: x, end: x + width }));
+  const areas = useAreas();
 
   const left = areas.reduce(
     (acc, curr) =>

@@ -16,14 +16,11 @@ export const Th: FC<TableHeadCellProps> = (props) => {
   const { column, idx, metadata, reorder, onDragStatusChange } = props;
 
   /* eslint-disable-next-line */
-  const [{ isOver }, drop] = useDrop({
+  const [, drop] = useDrop({
     accept: "column",
     drop: (item: DraggedItem) => {
       reorder(item, idx);
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver()
-    })
+    }
   });
 
   /* eslint-disable-next-line */
